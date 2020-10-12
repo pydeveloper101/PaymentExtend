@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_account_payment_receipt_form">
+        <field name="name">account.payment.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <!-- <xpath expr="//header" postion="inside">
+                <button name="onchange_partner_id_li_cr_dr" type="object" string="Payment Information" states='draft' class="oe_highlight"/>
+            </xpath> -->
+            <xpath expr="//sheet" postion="inside">
+                <notebook>
+                  <page string="Payment Information" attrs="{'invisible': [('payment_type', 'not in', ('inbound', 'outbound'))]}">
+                      <label for="line_cr_ids" attrs="{'invisible': [('payment_type', 'not in', ('inbound', 'outbound'))]}"/>
+                      <field name="line_cr_ids" attrs="{'invisible': [('payment_type', 'not in', ('inbound', 'outbound'))]}">
+                          <tree string="Open Customer Journal Entries" editable="bottom" create='false' delete="false" colors="gray:amount_original==0">
+                              <field name="move_line_id"/>
+                              <field name="account_id"/>
+                              <field name="date_original" readonly="1"/>
+                              <field name="date_due" readonly="1"/>
+                              <field name="amount_original" sum="amount_original" readonly="1"/>
+                              <field name="amount_unreconciled" readonly="1"/>
+                              <field name="full_allocation"/>
+                              <field name="amount_allocation" sum="Total Allocation"/>
+                          </tree>
+                      </field>
+                      <label for="line_dr_ids" attrs="{'invisible': [('payment_type', 'not in', ('inbound', 'outbound'))]}"/>
+                      <field name="line_dr_ids" attrs="{'invisible': [('payment_type', 'not in', ('inbound', 'outbound'))]}">
+                          <tree string="Open Supplier Journal Entries" editable="bottom" create='false' delete="false" colors="gray:amount_original==0">
+                              <field name="move_line_id"/>
+                              <field name="account_id"/>
+                              <field name="date_original" readonly="1"/>
+                              <field name="date_due" readonly="1"/>
+                              <field name="amount_original" readonly="1"/>
+                              <field name="amount_unreconciled" readonly="1"/>
+                              <field name="full_allocation"/>
+                              <field name="amount_allocation" sum="Total Allocation"/>
+                          </tree>
+                      </field>
+                      <group>
+                        <group>
+                        </group>
+                        <group>
+                            <separator string="Payment Options" colspan="2"/>
+                            <field name="writeoff_amount" widget='monetary' options='{"currency_field": "currency_id"}'/>
+                            <field name="payment_option" required="1" attrs="{'invisible':[('writeoff_amount','=',0)]}"/>
+                            <field name="writeoff_acc_id" attrs="{'invisible': [('payment_option', '=','without_writeoff')],'required': [('payment_option', '!=','without_writeoff')]}"/>
+                            <field name="writeoff_comment" attrs="{'invisible': [('payment_option', '=','without_writeoff')],'required': [('payment_option', '!=','without_writeoff')]}"/>
+                        </group>
+                    </group>
+                  </page>
+              </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_account_payments_internal_transfer" model="ir.actions.act_window">
+            <field name="name">Internal Transfer</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'transfer', 'default_partner_type': 'customer'}</field>
+            <field name="domain">[('payment_type', '=', 'transfer')]</field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                  Click to register a payment
+                </p><p>
+                  Payments are used to register liquidity movements (send, collect or transfer money).
+                  You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+        </record>
+
+    <record id="action_account_payments_payable_internal_transfer" model="ir.actions.act_window">
+            <field name="name">Internal Transfer</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'transfer', 'default_partner_type': 'supplier'}</field>
+            <field name="domain">[('payment_type', '=', 'transfer')]</field>
+            <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                  Click to register a payment
+                </p><p>
+                  Payments are used to register liquidity movements (send, collect or transfer money).
+                  You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+    </record>
+
+    <menuitem action="action_account_payments_internal_transfer" id="menu_action_account_payments_receivable_internal_tr" 
+              parent="account.menu_finance_receivables" sequence="20" groups="account.group_account_user"/>
+    <menuitem action="action_account_payments_payable_internal_transfer" id="menu_action_account_payments_payable_internal_tr" 
+              parent="account.menu_finance_payables" sequence="20" groups="account.group_account_user"/>
+
+
+</odoo>
